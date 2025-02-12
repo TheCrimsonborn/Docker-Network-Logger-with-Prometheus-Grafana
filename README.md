@@ -20,7 +20,6 @@ This project is a **containerized network monitoring and logging solution** that
 │   ├── network_logger.py         # Python app for network monitoring
 │   ├── requirements.txt          # Dependencies
 │── 📂 logs
-│── .dockerignore                 # Files ignored in Docker build
 │── Dockerfile                    # Docker build configuration
 │── docker-compose.yml            # Docker Compose setup
 ├── grafana-dashboard.json        # Grafana dashboard config
