@@ -1,0 +1,46 @@
+services:
+  network-logger:
+    build: .
+    container_name: docker-network-logger
+    environment:
+      - BLACKLIST_SOURCE_IPS=172.16.70.21
+      - BLACKLIST_DESTINATION_IPS=10.10.20.33
+    restart: always
+    privileged: true
+    network_mode: "host"  # Allows access to all Docker networks
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./logs:/logs
+    ports:
+      - "8000:8000"
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+    depends_on:
+      - network-logger
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - monitoring
+    depends_on:
+      - prometheus
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  grafana-data:
