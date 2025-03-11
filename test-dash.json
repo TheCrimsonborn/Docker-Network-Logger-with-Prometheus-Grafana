@@ -1,0 +1,84 @@
+{
+    "dashboard": {
+      "id": null,
+      "uid": null,
+      "title": "Network Logger Full Metrics",
+      "tags": ["network", "prometheus", "monitoring"],
+      "timezone": "browser",
+      "schemaVersion": 26,
+      "version": 1,
+      "refresh": "5s",
+      "panels": [
+        {
+          "title": "Garbage Collection Metrics",
+          "type": "graph",
+          "targets": [
+            { "expr": "python_gc_objects_collected_total", "legendFormat": "Objects Collected" },
+            { "expr": "python_gc_objects_uncollectable_total", "legendFormat": "Uncollectable Objects" },
+            { "expr": "python_gc_collections_total", "legendFormat": "GC Runs" }
+          ]
+        },
+        {
+          "title": "Process Metrics",
+          "type": "graph",
+          "targets": [
+            { "expr": "process_cpu_seconds_total", "legendFormat": "CPU Time" },
+            { "expr": "process_resident_memory_bytes", "legendFormat": "Memory Usage" },
+            { "expr": "process_virtual_memory_bytes", "legendFormat": "Virtual Memory" },
+            { "expr": "process_open_fds", "legendFormat": "Open File Descriptors" },
+            { "expr": "process_max_fds", "legendFormat": "Max Open File Descriptors" }
+          ]
+        },
+        {
+          "title": "Network Packets Per Protocol",
+          "type": "graph",
+          "targets": [
+            { "expr": "network_logger_packets_total", "legendFormat": "{{protocol}}" }
+          ]
+        },
+        {
+          "title": "Captured Packets Creation Time",
+          "type": "graph",
+          "targets": [
+            { "expr": "network_logger_packets_created", "legendFormat": "{{protocol}}" }
+          ]
+        },
+        {
+          "title": "Bandwidth Usage Per IP",
+          "type": "table",
+          "targets": [
+            { "expr": "network_logger_bandwidth_bytes_total", "legendFormat": "{{ip}}" }
+          ]
+        },
+        {
+          "title": "Bandwidth Creation Time Per IP",
+          "type": "graph",
+          "targets": [
+            { "expr": "network_logger_bandwidth_bytes_created", "legendFormat": "{{ip}}" }
+          ]
+        },
+        {
+          "title": "Average Packet Size Per IP",
+          "type": "graph",
+          "targets": [
+            { "expr": "network_logger_avg_packet_size", "legendFormat": "{{ip}}" }
+          ]
+        },
+        {
+          "title": "GeoIP Traffic Per Country",
+          "type": "table",
+          "targets": [
+            { "expr": "network_logger_geoip_traffic_total", "legendFormat": "{{destination_country}} - {{source_country}}" }
+          ]
+        },
+        {
+          "title": "GeoIP Traffic Creation Time Per Country",
+          "type": "graph",
+          "targets": [
+            { "expr": "network_logger_geoip_traffic_created", "legendFormat": "{{destination_country}} - {{source_country}}" }
+          ]
+        }
+      ]
+    }
+  }
+  

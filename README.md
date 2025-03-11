@@ -111,7 +111,8 @@ Want to contribute? Open a pull request or submit an issue! 🚀
 ---
 
 ## 📜 **License**
-MIT License. Free to use and modify!
+This project is licensed under the terms of the GNU General Public License v3.0.  
+See the [LICENSE](LICENSE) file for details.
 
 ---
 
