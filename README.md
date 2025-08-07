@@ -1,121 +1,126 @@
-# Docker Network Monitor
+# Docker Network Logger with Prometheus, Grafana, Loki, and Tempo
 
 ## 📌 Overview
-This project is a **containerized network monitoring and logging solution** that tracks **network traffic, bandwidth usage, and protocol analysis** using **Python, Prometheus, and Grafana**.
-
-### **✨ Features**
-- 🚀 **Real-time network packet monitoring**
-- 📊 **Grafana dashboards for visualization**
-- 📡 **Prometheus integration for metric collection**
-- 📡 **Bandwidth usage & packet size monitoring**
-- 🔥 **Blacklist support for filtering specific IPs**
-- 🔄 **Automatic log rotation (1GB max)**
+A fully containerized network monitoring, logging, and tracing solution.  
+It captures network traffic, exposes Prometheus metrics, stores logs in Loki, and collects distributed traces with Tempo — all visualized in Grafana.
 
 ---
 
-## 📂 **Project Structure**
+## ✨ Features
+- **Real-time** network packet monitoring with Python
+- **Prometheus metrics** for network data
+- **Grafana dashboards** for metrics, logs, and traces
+- **Loki + Promtail** for centralized log aggregation
+- **Tempo** for distributed tracing (OTLP HTTP & gRPC)
+- Blacklist support to ignore unwanted IPs
+- Automatic log rotation when log file exceeds **1GB**
+
+---
+
+## 📂 Project Structure
 ```
 📁 docker-network-monitor
 │── 📂 src
-│   ├── network_logger.py         # Python app for network monitoring
-│   ├── requirements.txt          # Dependencies
+│   ├── network_logger.py
+│   ├── requirements.txt
 │── 📂 logs
-│── Dockerfile                    # Docker build configuration
-│── docker-compose.yml            # Docker Compose setup
-├── grafana-dashboard.json        # Grafana dashboard config
-├── prometheus.yml                # Prometheus scrape config
-│── README.md                     # Project Documentation
+│── 📂 configs
+│   ├── prometheus.yml
+│   ├── loki-config.yml
+│   ├── promtail-config.yml
+│   ├── tempo-config.yml
+│── Dockerfile
+│── docker-compose.yml
+│── grafana-dashboard.json
+│── README.md
 ```
 
 ---
 
-## 🚀 **Setup & Installation**
-### **1️⃣ Prerequisites**
-Make sure you have:
-- **Docker** installed → [Install Docker](https://docs.docker.com/get-docker/)
-- **Docker Compose** installed → [Install Compose](https://docs.docker.com/compose/install/)
+## 🚀 Setup & Installation
 
-### **2️⃣ Clone the Repository**
+### 1️⃣ Prerequisites
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### 2️⃣ Clone Repository
 ```bash
 git clone https://github.com/your-username/docker-network-monitor.git
 cd docker-network-monitor
 ```
 
-### **3️⃣ Build & Run Containers**
+### 3️⃣ Build & Run
 ```bash
 docker compose up --build -d
 ```
-- `-d` runs in **detached mode**
-- **Containers started:**
-  - `network-logger`: Captures network traffic
-  - `prometheus`: Collects and stores network metrics
-  - `grafana`: Displays network dashboards
 
-### **4️⃣ Access Services**
-- **Prometheus:** [`http://localhost:9090`](http://localhost:9090)
-- **Grafana:** [`http://localhost:3000`](http://localhost:3000) *(Login: `admin/admin`)*
-- **Network Logger Metrics:** [`http://localhost:8000/metrics`](http://localhost:8000/metrics)
+**Containers started:**
+- `network-logger` → Captures network traffic and exposes metrics
+- `prometheus` → Collects and stores metrics
+- `grafana` → Visualizes metrics, logs, and traces
+- `loki` → Stores logs
+- `promtail` → Ships logs to Loki
+- `tempo` → Stores and queries distributed traces
 
 ---
 
-## 📊 **Grafana Dashboard**
-To import the **Grafana Dashboard**:
-1. Open Grafana → Dashboards → **Import**
-2. Upload **`grafana/grafana-dashboard.json`**
-3. Set **Prometheus** as the data source
-4. Click **Import** ✅
+## 🌐 Access Services
+- Prometheus → [http://localhost:9090](http://localhost:9090)
+- Grafana → [http://localhost:3000](http://localhost:3000) *(admin/admin)*
+- Loki API → [http://localhost:3100](http://localhost:3100)
+- Tempo API → [http://localhost:3200](http://localhost:3200)
+- Network Logger Metrics → [http://localhost:8000/metrics](http://localhost:8000/metrics)
 
 ---
 
-## 🔥 **Custom Configurations**
-### **Blacklist IPs** (Edit `docker-compose.yml`)
+## 📊 Grafana Dashboard
+1. Go to Grafana → Dashboards → Import
+2. Upload `grafana-dashboard.json`
+3. Set data sources:
+   - Prometheus → `http://prometheus:9090`
+   - Loki → `http://loki:3100`
+   - Tempo → `http://tempo:3200`
+4. Click Import ✅
+
+---
+
+## ⚙️ Custom Configuration
+
+### Blacklist IPs
+Edit `docker-compose.yml`:
 ```yaml
-env:
+environment:
   BLACKLIST_SOURCE_IPS: "10.10.20.33,192.168.1.100"
   BLACKLIST_DESTINATION_IPS: "172.19.0.5,34.120.177.193"
 ```
-Restart to apply:
+Restart:
 ```bash
-docker compose down
-docker compose up -d
+docker compose down && docker compose up -d
 ```
 
-### **Log Rotation (Max 1GB)**
-The script will automatically **reset logs** when `docker_network_logs.json` reaches **1GB**.
+### Log Rotation
+When `docker_network_logs.json` exceeds **1GB**, it resets automatically.
 
 ---
 
-## 🛠 **Troubleshooting**
-### **🔹 No Network Logs?**
-Check logs:
-```bash
-docker logs network-logger -f
-```
-Make sure you run Docker with **network monitoring permissions**:
-```bash
-sudo setcap cap_net_raw,cap_net_admin=eip $(which dumpcap)
-```
+## 🛠 Troubleshooting
 
-### **🔹 Grafana Not Showing Data?**
-Check Prometheus logs:
+**No Logs?**
+```bash
+docker logs promtail -f
+```
+Ensure `./logs` contains files.
+
+**No Metrics?**
 ```bash
 docker logs prometheus -f
 ```
-Verify that `http://localhost:8000/metrics` is accessible.
+Check if `http://localhost:8000/metrics` works.
+
+**No Traces?**
+Verify your app sends OTLP data to Tempo on port `4317` (gRPC) or `4318` (HTTP).
 
 ---
 
-## 🚀 **Contributing**
-Want to contribute? Open a pull request or submit an issue! 🚀
-
----
-
-## 📜 **License**
-This project is licensed under the terms of the GNU General Public License v3.0.  
-See the [LICENSE](LICENSE) file for details.
-
----
-
-## ⭐ **Like This Project?**
-Give it a **star** ⭐ on GitHub to support development! 🙌
-
+## 📜 License
+GNU GPL v3.0 — see LICENSE for details.
